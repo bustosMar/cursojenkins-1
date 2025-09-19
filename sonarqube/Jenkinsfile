@@ -7,8 +7,14 @@ node {
     }
 
     stage('Construcción') {
-      myGradleContainer.inside("-v ${env.HOME}/.gradle:/home/gradle/.gradle") {
-        sh 'cd complete && /opt/gradle/bin/gradle build'
+      // Se asigna memoria y ulimit
+      myGradleContainer.inside("-v ${env.HOME}/.gradle:/home/gradle/.gradle --memory=2g --memory-swap=2g --ulimit nofile=65535:65535") {
+        // Limitar memoria JVM de Gradle
+        sh '''
+          cd complete
+          echo "org.gradle.jvmargs=-Xmx512m -Dfile.encoding=UTF-8" > gradle.properties
+          /opt/gradle/bin/gradle build
+        '''
       }
     }
 
